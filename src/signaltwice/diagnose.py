@@ -38,10 +38,6 @@ result = pipeline.run_diagnosis(
 
 """
 
-# Allow running as a script from the repo root.
-if __package__ is None or __package__ == "":
-    sys.path.append(str(Path(__file__).resolve().parents[1]))
-
 from signaltwice.core.protocol import (
     BasicInfoService,
     ParameterService,

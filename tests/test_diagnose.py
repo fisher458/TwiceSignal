@@ -2,12 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 from unittest.mock import Mock
-import sys
 
 import polars as pl
-
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.append(str(ROOT / "src"))
 
 from signaltwice.diagnose import DiagnosticPipeline, OutputConfig
 
