@@ -68,3 +68,70 @@ def test_write_report_uses_writer_and_writes_file(tmp_path) -> None:
     writer_instance.assert_called_once_with(report_text, str(report_path))
     assert report_path.exists()
     assert report_path.read_text(encoding="utf-8") == report_text
+
+
+class _NoopPlotter:
+    def run_batch(self, frame, metrics, save_fn) -> None:  # pragma: no cover - trivial
+        return None
+
+
+def test_run_diagnosis_reader_failure_marks_required_steps(tmp_path) -> None:
+    pipeline = DiagnosticPipeline(output_dir=tmp_path)
+    pipeline.reader = Mock()
+    pipeline.reader.auto_read.side_effect = FileNotFoundError("missing")
+
+    result = pipeline.run_diagnosis("missing.csv")
+
+    assert result["success"] is False
+    assert result["status"]["extract"]["ok"] is False
+    assert result["status"]["preprocess"]["ok"] is False
+    assert result["status"]["diagnostics"]["ok"] is False
+    assert result["error"].startswith("Extract failed")
+
+
+def test_run_diagnosis_report_write_failure_marks_report_failed(tmp_path) -> None:
+    csv_path = tmp_path / "input.csv"
+    csv_path.write_text("a,b\\n1,foo\\n2,bar\\n", encoding="utf-8")
+
+    report_dir = tmp_path / "report_path"
+    report_dir.mkdir()
+
+    pipeline = DiagnosticPipeline(output_dir=tmp_path, reader_lazy=False)
+    pipeline.plotter = _NoopPlotter()
+
+    result = pipeline.run_diagnosis(
+        csv_path,
+        output_config=OutputConfig(
+            report_path=report_dir,
+            plot_dir=tmp_path / "plots",
+            parameter_path=tmp_path / "params.json",
+        ),
+    )
+
+    assert result["success"] is True
+    assert result["status"]["report"]["ok"] is False
+    assert result["status"]["diagnostics"]["ok"] is True
+
+
+def test_run_diagnosis_plot_dir_failure_marks_plots_failed(tmp_path) -> None:
+    csv_path = tmp_path / "input.csv"
+    csv_path.write_text("a,b\\n1,foo\\n2,bar\\n", encoding="utf-8")
+
+    plot_file = tmp_path / "plots"
+    plot_file.write_text("not a dir", encoding="utf-8")
+
+    pipeline = DiagnosticPipeline(output_dir=tmp_path, reader_lazy=False)
+    pipeline.plotter = _NoopPlotter()
+
+    result = pipeline.run_diagnosis(
+        csv_path,
+        output_config=OutputConfig(
+            report_path=tmp_path / "report.txt",
+            plot_dir=plot_file,
+            parameter_path=tmp_path / "params.json",
+        ),
+    )
+
+    assert result["success"] is True
+    assert result["status"]["plots"]["ok"] is False
+    assert result["status"]["diagnostics"]["ok"] is True

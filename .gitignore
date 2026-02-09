@@ -25,6 +25,30 @@ venv/
 ENV/
 env/
 
+# Test / coverage caches
+.pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+*.cover
+
+# Lint / type check caches
+.ruff_cache/
+.mypy_cache/
+.pytype/
+.pyre/
+.pyright/
+
+# UV cache
+.uv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Logs
+*.log
+
 # Environment variables
 .env
 .env.*
