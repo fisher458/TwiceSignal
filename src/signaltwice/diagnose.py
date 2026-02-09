@@ -1,18 +1,5 @@
-from __future__ import annotations
-
-import sys
-import logging as py_logging
-from pathlib import Path
-from typing import Any, Dict, Iterable, List
-import json
-
-import polars as pl
-
-
-
-#到時候需要override這些參數
-
 """
+#到時候需要override這些參數
 
 from signaltwice.diagnose import DiagnosticPipeline, OutputConfig
 
@@ -33,10 +20,17 @@ result = pipeline.run_diagnosis(
     plot_dpi=300,
     image_quality=85,
 )
-
-
-
 """
+
+from __future__ import annotations
+
+import sys
+import logging as py_logging
+from pathlib import Path
+from typing import Any, Dict, Iterable, List
+import json
+
+import polars as pl
 
 from signaltwice.core.protocol import (
     BasicInfoService,

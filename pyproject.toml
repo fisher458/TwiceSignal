@@ -16,4 +16,17 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pytest>=9.0.2",
+    "ruff>=0.15.0",
+    "signaltwice",
 ]
+
+[tool.uv.workspace]
+members = [
+    ".",
+]
+
+[tool.uv.sources]
+signaltwice = { workspace = true, editable = true }
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
